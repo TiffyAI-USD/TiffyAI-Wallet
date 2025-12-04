@@ -1,259 +1,720 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
   <title>TiffyWallet</title>
 
-  <!-- OFFICIAL ethers.js v6.13.1 — TRUST WALLET APPROVED -->
+  <!-- Ethers.js v6.13.1 -->
   <script src="https://cdn.ethers.io/lib/ethers-6.13.1.umd.min.js" type="text/javascript"></script>
 
   <style>
-    :root {
-      --bg: #000;
-      --text: #00f0ff;
-      --accent: #00f0ff;
-      --accent2: #ff00d4;
-      --card: rgba(0, 240, 255, 0.05);
-      --border: rgba(0, 240, 255, 0.2);
+    :root{
+      --bg:#000;--text:#00f0ff;--accent:#00f0ff;--accent2:#ff00d4;
+      --card:rgba(0,240,255,0.05);--border:rgba(0,240,255,0.2);
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Courier New', monospace;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .header {
-      padding: 20px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-    }
-    .logo {
-      width: 80px; height: 80px;
-      margin: 0 auto 12px;
-      background: url('https://tiffyai-usd.github.io/Dream-Menu/TiffyAI-Token.png') center/cover;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    h1 {
-      font-size: 24px;
-      letter-spacing: 2px;
-    }
-    .balance {
-      padding: 24px 20px;
-      text-align: center;
-      border-bottom: 1px dashed var(--border);
-    }
-    .amount {
-      font-size: 36px;
-      font-weight: 900;
-      margin-bottom: 4px;
-    }
-    .usd {
-      font-size: 18px;
-      opacity: 0.8;
-    }
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      padding: 20px;
-    }
-    .btn {
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-    .btn:active {
-      background: var(--accent);
-      color: #000;
-      transform: scale(0.95);
-    }
-    .ai-pulse {
-      padding: 16px 20px;
-      background: rgba(0, 240, 255, 0.1);
-      border-top: 1px solid var(--border);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .ai-text {
-      display: block;
-      margin-top: 6px;
-      font-style: italic;
-      opacity: 0.9;
-    }
-    .footer {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
-    .footer-btn {
-      font-size: 12px;
-      padding: 10px;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      opacity: 0.7;
-    }
-    .footer-btn:active { opacity: 1; color: var(--accent); }
-    .hidden { display: none; }
-    #connectBtn {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #000;
-      font-weight: 900;
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+    .container{max-width:820px;margin:0 auto;width:100%}
+    .header{padding:20px;text-align:center;border-bottom:1px solid var(--border)}
+    .logo{width:80px;height:80px;margin:0 auto 12px;background:url('https://tiffyai-usd.github.io/Dream-Menu/TiffyAI-Token.png') center/cover;border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+    h1{font-size:24px;letter-spacing:2px}
+    .nav{display:flex;gap:8px;padding:14px;border-bottom:1px dashed var(--border);justify-content:center}
+    .nav button{background:transparent;border:1px solid var(--border);padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer}
+    .main{padding:20px;flex:1;overflow:auto}
+    .card{background:var(--card);border:1px solid var(--border);padding:16px;border-radius:12px;margin-bottom:12px}
+    .balance{display:flex;flex-direction:column;align-items:center}
+    .amount{font-size:36px;font-weight:900;margin-bottom:4px}
+    .usd{font-size:16px;opacity:0.8}
+    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
+    .btn{background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;text-align:center}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000}
+    .small{font-size:12px;padding:8px}
+    .ai-pulse{padding:12px;background:rgba(0,240,255,0.05);border-top:1px solid var(--border);font-size:14px}
+    .footer{display:flex;gap:8px;padding:16px;border-top:1px solid var(--border);margin-top:12px;justify-content:center}
+    input, textarea, select{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;width:100%}
+    label{font-size:12px;opacity:0.8}
+    .row{display:flex;gap:8px}
+    .col{flex:1}
+    pre{white-space:pre-wrap;word-break:break-word;font-size:12px}
+    .hidden{display:none}
+    .tx-item{border-bottom:1px dashed var(--border);padding:8px 0}
+    .qr{display:block;margin:10px auto;max-width:220px}
+    .muted{opacity:0.7;font-size:12px}
+    .danger{color:#ff6b6b}
+    .success{color:#4EE39A}
   </style>
 </head>
 <body>
-
-  <!-- DASH -->
-  <div id="dash">
+  <div class="container">
     <div class="header">
       <div class="logo"></div>
-      <h1>TIFFY WALLET</h1>
+      <h1>TiffyWallet</h1>
     </div>
 
-    <div class="balance">
-      <div class="amount" id="balanceAmount">0.00</div>
-      <div class="usd" id="balanceUSD">≈ $0.00 USD</div>
+    <div class="nav" id="nav">
+      <button onclick="show('dash')">Dashboard</button>
+      <button onclick="show('send')">Send</button>
+      <button onclick="show('receive')">Receive</button>
+      <button onclick="show('history')">History</button>
+      <button onclick="show('ai')">AI Trades</button>
+      <button onclick="show('settings')">Settings</button>
     </div>
 
-    <div class="actions">
-      <div class="btn" id="connectBtn" onclick="connectWallet()">CONNECT WALLET</div>
-      <div class="btn" onclick="openSend()">SEND</div>
-      <div class="btn" onclick="openReceive()">RECEIVE</div>
-    </div>
+    <div class="main">
+      <!-- DASH -->
+      <div id="dash">
+        <div class="card balance">
+          <div class="amount" id="balanceAmount">0.00</div>
+          <div class="usd" id="balanceUSD">≈ $0.00 USD</div>
+          <div class="muted" id="addressShort">Not connected</div>
+          <div style="margin-top:12px" class="actions">
+            <div class="btn primary" id="connectBtn" onclick="connectWallet()">CONNECT WALLET</div>
+            <div class="btn" onclick="show('send')">SEND</div>
+            <div class="btn" onclick="show('receive')">RECEIVE</div>
+          </div>
+        </div>
 
-    <div class="ai-pulse">
-      AI Pulse
-      <span class="ai-text" id="aiMessage">Waiting for connection...</span>
+        <div class="card">
+          <div><strong>TIFFY Token</strong></div>
+          <div id="tiffyInfo" style="margin-top:8px">Loading token info...</div>
+        </div>
+
+        <div class="card ai-pulse">
+          <div><strong>AI Pulse</strong></div>
+          <div class="muted" id="aiMessage">Waiting for connection...</div>
+        </div>
+      </div>
+
+      <!-- SEND -->
+      <div id="send" class="hidden">
+        <div class="card">
+          <label>Token</label>
+          <select id="sendToken">
+            <option value="BNB">BNB</option>
+            <option value="TIFFY">TIFFY</option>
+          </select>
+
+          <div style="margin-top:8px" class="row">
+            <div class="col">
+              <label>To</label>
+              <input id="toAddress" placeholder="0x..." />
+            </div>
+            <div style="width:120px">
+              <label>Amount</label>
+              <input id="sendAmount" placeholder="0.01" />
+            </div>
+          </div>
+
+          <div style="margin-top:8px" class="row">
+            <div class="col">
+              <label>Gas Limit (optional)</label>
+              <input id="gasLimit" placeholder="Automatic" />
+            </div>
+            <div style="width:160px">
+              <label>Nonce (optional)</label>
+              <input id="nonce" placeholder="Auto" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <div class="btn primary" onclick="sendTx()">SEND</div>
+            <div class="btn" onclick="pasteTo()">PASTE TO</div>
+            <div class="btn" onclick="show('dash')">CANCEL</div>
+          </div>
+
+          <div style="margin-top:12px"><label>Status</label><pre id="sendStatus">idle</pre></div>
+        </div>
+      </div>
+
+      <!-- RECEIVE -->
+      <div id="receive" class="hidden">
+        <div class="card">
+          <div><label>Your Address</label></div>
+          <div style="margin-top:8px"><input id="receiveAddress" readonly /></div>
+          <div style="margin-top:8px;text-align:center">
+            <canvas id="qrcanvas" class="qr"></canvas>
+            <div class="muted">Tap/click address to copy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="history" class="hidden">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Local History</strong></div>
+            <div>
+              <button class="btn small" onclick="clearHistory()">Clear</button>
+              <button class="btn small" onclick="fetchOnChainHistory()">Fetch on-chain (BscScan)</button>
+            </div>
+          </div>
+
+          <div id="historyList" style="margin-top:12px"></div>
+          <div style="margin-top:8px" class="muted">Local history stores actions made in this wallet UI. On-chain fetch requires BscScan API key in Settings.</div>
+        </div>
+      </div>
+
+      <!-- AI TRADES -->
+      <div id="ai" class="hidden">
+        <div class="card">
+          <div><strong>AI Trades</strong></div>
+          <div style="margin-top:8px">
+            <label>Contract method to call (if your TIFFY contract exposes an AI trade method)</label>
+            <input id="aiMethod" placeholder="e.g. executeAITrade" />
+          </div>
+
+          <div style="margin-top:8px" class="row">
+            <div class="col">
+              <label>Params (JSON array)</label>
+              <input id="aiParams" placeholder='e.g. ["0x...", 100]' />
+            </div>
+            <div style="width:160px">
+              <label>Value (BNB)</label>
+              <input id="aiValue" placeholder="0.0" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <div class="btn primary" onclick="callAITrade()">RUN AI TRADE</div>
+            <div class="btn" onclick="show('dash')">BACK</div>
+          </div>
+
+          <div style="margin-top:12px"><label>AI Status</label><pre id="aiStatus">idle</pre></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="settings" class="hidden">
+        <div class="card">
+          <div><strong>Settings & Advanced</strong></div>
+
+          <div style="margin-top:8px">
+            <label>TIFFY Contract Address</label>
+            <input id="tiffyAddress" value="0xE488253DD6B4D31431142F1b7601C96f24Fb7dd5" />
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Paste TIFFY ABI (JSON) to enable AI trader & custom calls</label>
+            <textarea id="tiffyABI" rows="6" placeholder='[ ... ABI ... ]'></textarea>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>BscScan API Key (optional, for on-chain tx history)</label>
+            <input id="bscscanKey" placeholder="Enter BscScan API key" />
+          </div>
+
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <div class="btn" onclick="saveSettings()">Save</div>
+            <div class="btn" onclick="generateLocalWallet()">Generate Local Wallet</div>
+            <div class="btn" onclick="importEncryptedWallet()">Import Encrypted Wallet</div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Local Wallet (encrypted JSON stored in localStorage)</label>
+            <pre id="localWalletInfo">none</pre>
+          </div>
+
+          <div style="margin-top:6px" class="muted">Note: This app will not export private keys from injected wallets (MetaMask/Trust). Use the local wallet option if you want this app to control keys directly.</div>
+        </div>
+      </div>
     </div>
 
     <div class="footer">
-      <div class="footer-btn" onclick="openHistory()">History</div>
-      <div class="footer-btn" onclick="openAITrades()">AI Trades</div>
-      <div class="footer-btn" onclick="openSettings()">Settings</div>
+      <div class="muted">Built for you — trustless & minimal</div>
     </div>
   </div>
 
 <script>
-  // Wait for ethers.js to load
-  window.addEventListener('load', () => {
-    if (typeof ethers === 'undefined') {
-      alert("ethers.js failed to load. Check internet.");
+/* ======= TiffyWallet Single File Implementation =======
+   - universal provider detection (TrustWallet/MetaMask/others)
+   - BNB + TIFFY balance
+   - Send BNB & TIFFY
+   - Receive QR + copy
+   - Local history + optional BscScan fetch
+   - AI trades (placeholder — paste ABI in settings)
+   - Settings: paste ABI, BscScan key, generate local wallet
+======================================================*/
+
+(async () => {
+  // --- Constants & state
+  const DEFAULT_CHAIN = {
+    chainId: '0x38', // BSC
+    chainName: 'BNB Smart Chain',
+    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+    blockExplorerUrls: ['https://bscscan.com']
+  };
+
+  // your given TIFFY address
+  const DEFAULT_TIFFY = '0xE488253DD6B4D31431142F1b7601C96f24Fb7dd5';
+
+  // minimal ABI for balance read
+  const MIN_ABI = [
+    "function balanceOf(address) view returns (uint256)",
+    "function decimals() view returns (uint8)",
+    "function symbol() view returns (string)"
+  ];
+
+  // UI refs
+  const connectBtn = document.getElementById('connectBtn');
+  const balanceAmount = document.getElementById('balanceAmount');
+  const balanceUSD = document.getElementById('balanceUSD');
+  const addressShort = document.getElementById('addressShort');
+  const tiffyInfo = document.getElementById('tiffyInfo');
+  const aiMessage = document.getElementById('aiMessage');
+  const receiveAddress = document.getElementById('receiveAddress');
+  const qrcanvas = document.getElementById('qrcanvas');
+
+  // local state
+  let provider = null;
+  let signer = null;
+  let userAddress = null;
+  let tokenContract = null;
+  let tokenDecimals = 18;
+  let tokenSymbol = 'TIFFY';
+  let localSettings = {
+    tiffyAddress: DEFAULT_TIFFY,
+    tiffyABI: '',
+    bscscanKey: ''
+  };
+
+  // ----- UTIL -----
+  function getProviderObject() {
+    if (window.ethereum) return window.ethereum;
+    if (window.trustwallet) return window.trustwallet;
+    if (window.wallet_provider) return window.wallet_provider;
+    // Some wallets expose as window.web3.currentProvider (legacy)
+    if (window.web3 && window.web3.currentProvider) return window.web3.currentProvider;
+    return null;
+  }
+
+  function show(id) {
+    ['dash','send','receive','history','ai','settings'].forEach(x=>{
+      document.getElementById(x).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+    if (id === 'receive') renderQR();
+    if (id === 'history') renderHistory();
+  }
+  window.show = show;
+
+  function saveLocalHistory(entry) {
+    const key = 'tiffy_history_v1';
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    arr.unshift({ts: Date.now(), ...entry});
+    localStorage.setItem(key, JSON.stringify(arr.slice(0,200)));
+  }
+
+  function loadLocalHistory() {
+    return JSON.parse(localStorage.getItem('tiffy_history_v1') || '[]');
+  }
+
+  function clearHistory() {
+    localStorage.removeItem('tiffy_history_v1');
+    renderHistory();
+  }
+  window.clearHistory = clearHistory;
+
+  // MINOR UI helpers
+  function setStatus(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function short(addr) {
+    if (!addr) return 'Not connected';
+    return addr.slice(0,6)+'...'+addr.slice(-4);
+  }
+
+  // ==== QR generation minimal (no external libs) ====
+  // Very small QR generator inspired by kjua-lite approach: uses a data URI via Google Chart is easiest but offline: we'll make a simple fallback that writes address text onto canvas.
+  function renderQR() {
+    const addr = userAddress || localSettings.tiffyAddress;
+    receiveAddress.value = addr || '';
+    const ctx = qrcanvas.getContext ? qrcanvas.getContext('2d') : null;
+    if (!ctx) return;
+    const size = Math.min(220, window.innerWidth * 0.6);
+    qrcanvas.width = size;
+    qrcanvas.height = size;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '12px monospace';
+    const lines = [];
+    for (let i=0;i<addr.length;i+=20) lines.push(addr.slice(i,i+20));
+    const top = 20;
+    lines.forEach((l,i)=> ctx.fillText(l, 8, top + i*16));
+  }
+
+  // copy address on click
+  receiveAddress.addEventListener('click', async ()=>{
+    if (!receiveAddress.value) return;
+    await navigator.clipboard.writeText(receiveAddress.value);
+    alert('Address copied to clipboard');
+  });
+
+  // save settings
+  function saveSettings() {
+    localSettings.tiffyAddress = document.getElementById('tiffyAddress').value.trim() || DEFAULT_TIFFY;
+    localSettings.tiffyABI = document.getElementById('tiffyABI').value.trim();
+    localSettings.bscscanKey = document.getElementById('bscscanKey').value.trim();
+    localStorage.setItem('tiffy_settings_v1', JSON.stringify(localSettings));
+    alert('Settings saved');
+    // reload token contract with new address/ABI
+    initTokenContract();
+  }
+  window.saveSettings = saveSettings;
+
+  function loadSettings() {
+    const saved = JSON.parse(localStorage.getItem('tiffy_settings_v1') || '{}');
+    localSettings = Object.assign(localSettings, saved);
+    document.getElementById('tiffyAddress').value = localSettings.tiffyAddress;
+    document.getElementById('tiffyABI').value = localSettings.tiffyABI;
+    document.getElementById('bscscanKey').value = localSettings.bscscanKey;
+    const localWallet = localStorage.getItem('tiffy_local_wallet_v1');
+    document.getElementById('localWalletInfo').textContent = localWallet ? 'encrypted wallet present' : 'none';
+  }
+
+  // ==== Connect / init ====
+  async function connectWallet() {
+    const eth = getProviderObject();
+    if (!eth) {
+      alert('No wallet found. Open inside Trust Wallet or MetaMask.');
       return;
     }
-
-    let provider = null;
-    let signer = null;
-    let userAddress = null;
-    let balance = 0;
-
-    // === REPLACE WITH YOUR REAL TIFFY TOKEN ===
-    const TIFFY_TOKEN = '0xYourTiffyTokenAddressHere'; 
-    const TIFFY_ABI = [
-      "function balanceOf(address) view returns (uint256)",
-      "function decimals() view returns (uint8)",
-      "function symbol() view returns (string)"
-    ];
-
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("No wallet found. Open in Trust Wallet or MetaMask.");
+    try {
+      connectBtn.textContent = 'Connecting...';
+      // request accounts
+      if (eth.request) {
+        const accounts = await eth.request({ method: 'eth_requestAccounts' });
+        userAddress = accounts[0];
+      } else if (eth.enable) {
+        const accounts = await eth.enable();
+        userAddress = accounts[0];
+      } else {
+        alert('Unsupported provider interface');
+        connectBtn.textContent = 'CONNECT WALLET';
         return;
       }
 
+      provider = new ethers.BrowserProvider(eth);
       try {
-        document.getElementById('connectBtn').textContent = 'Connecting...';
-
-        // Request access
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        userAddress = accounts[0];
-
-        // Create provider & signer
-        provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
+      } catch (e) {
+        signer = null;
+      }
 
-        // Switch to BSC
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x38' }],
-          });
-        } catch (e) {
-          if (e.code === 4902) {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: '0x38',
-                chainName: 'BNB Smart Chain',
-                rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                blockExplorerUrls: ['https://bscscan.com']
-              }]
-            });
+      // attempt chain switch to BSC
+      try {
+        await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: DEFAULT_CHAIN.chainId }] });
+      } catch (e) {
+        if (e && e.code === 4902) {
+          try {
+            await eth.request({ method: 'wallet_addEthereumChain', params: [DEFAULT_CHAIN] });
+          } catch (addErr) {
+            console.warn('add chain failed', addErr);
           }
         }
+      }
 
-        // Load TIFFY
-        const token = new ethers.Contract(TIFFY_TOKEN, TIFFY_ABI, provider);
-        const bal = await token.balanceOf(userAddress);
-        const decimals = await token.decimals();
-        balance = Number(ethers.formatUnits(bal, decimals)).toFixed(2);
+      // UI updates
+      connectBtn.textContent = 'CONNECTED';
+      connectBtn.disabled = true;
+      addressShort.textContent = short(userAddress);
+      document.getElementById('receiveAddress').value = userAddress;
+      renderQR();
 
-        // Update UI
-        document.getElementById('balanceAmount').textContent = balance;
-        document.getElementById('balanceUSD').textContent = `≈ $${(balance * 1.0).toFixed(2)} USD`;
-        document.getElementById('aiMessage').textContent = `Connected: ${userAddress.slice(0,6)}...`;
-        document.getElementById('connectBtn').textContent = 'CONNECTED';
-        document.getElementById('connectBtn').disabled = true;
+      await initTokenContract();
+      await refreshBalances();
+      // start AI messages
+      startAIPulse();
+      // expose
+      window.userAddress = userAddress;
+      saveLocalHistory({type:'connect', address:userAddress});
+    } catch (err) {
+      console.error(err);
+      alert('Connect failed: ' + (err.message || err));
+      connectBtn.textContent = 'CONNECT WALLET';
+    }
+  }
+  window.connectWallet = connectWallet;
 
-      } catch (error) {
-        console.error(error);
-        alert("Failed: " + (error.message || "Check console"));
-        document.getElementById('connectBtn').textContent = 'CONNECT WALLET';
+  // auto connect if accounts present
+  async function tryAutoConnect() {
+    const eth = getProviderObject();
+    if (!eth) return;
+    try {
+      const accounts = await eth.request?.({method:'eth_accounts'}) || [];
+      if (accounts && accounts.length > 0) {
+        await connectWallet();
+      }
+    } catch(e){ /* ignore */ }
+  }
+
+  // token contract init
+  async function initTokenContract() {
+    const addr = (document.getElementById('tiffyAddress').value || DEFAULT_TIFFY);
+    // use custom ABI if present
+    let abi = MIN_ABI;
+    const abiTxt = document.getElementById('tiffyABI').value.trim();
+    if (abiTxt) {
+      try {
+        abi = JSON.parse(abiTxt);
+      } catch(e) {
+        // not JSON? ignore
+        console.warn('Invalid ABI JSON, using minimal ABI');
       }
     }
+    try {
+      if (!provider) {
+        // create a readonly provider to call token functions
+        provider = ethers.getDefaultProvider('https://bsc-dataseed.binance.org/');
+      }
+      tokenContract = new ethers.Contract(addr, abi, provider);
+      // try read decimals & symbol
+      try {
+        tokenDecimals = (await tokenContract.decimals()).toString ? Number(await tokenContract.decimals()) : 18;
+      } catch(e){ tokenDecimals = 18; }
+      try { tokenSymbol = await tokenContract.symbol(); } catch(e){ tokenSymbol = 'TIFFY'; }
+      tiffyInfo.innerHTML = `<div><strong>${tokenSymbol}</strong> @ ${addr}</div><div class="muted">decimals: ${tokenDecimals}</div>`;
+    } catch (e) {
+      console.warn('token init failed', e);
+      tiffyInfo.textContent = 'Failed to init token contract';
+    }
+  }
 
-    // Auto-connect
-    window.ethereum?.request({ method: 'eth_accounts' }).then(accounts => {
-      if (accounts.length > 0) connectWallet();
-    });
+  // refresh balances
+  async function refreshBalances() {
+    try {
+      if (!provider) provider = ethers.getDefaultProvider('https://bsc-dataseed.binance.org/');
+      // BNB balance
+      if (userAddress) {
+        const rawBal = await provider.getBalance(userAddress);
+        const bnbBal = Number(ethers.formatUnits(rawBal, 18));
+        balanceAmount.textContent = bnbBal.toFixed(6) + ' BNB';
+        // token
+        if (tokenContract) {
+          try {
+            const bal = await tokenContract.balanceOf(userAddress);
+            const amount = Number(ethers.formatUnits(bal, tokenDecimals));
+            // show both
+            tiffyInfo.innerHTML = `<div><strong>${tokenSymbol}</strong>: ${amount}</div><div class="muted">contract: ${localSettings.tiffyAddress || DEFAULT_TIFFY}</div>`;
+          } catch(e){
+            tiffyInfo.innerHTML = `<div class="muted">token read failed</div>`;
+          }
+        }
+        // USD estimate: naive: no price feed — show same number x 1 for placeholder
+        balanceUSD.textContent = `≈ $${(bnbBal * 1).toFixed(2)} USD`;
+      } else {
+        balanceAmount.textContent = '0.00';
+        balanceUSD.textContent = '≈ $0.00 USD';
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
-    // AI Pulse
-    const aiMessages = [
+  // AI pulse messages
+  let aiInterval = null;
+  function startAIPulse() {
+    const messages = [
       "TIFFY volume spiking. AI says BUY.",
-      "Whale alert: 50k TIFFY moved.",
-      "AI: Market stable. HOLD."
+      "Whale alert: large TIFFY moved.",
+      "AI: Market stable. HOLD.",
+      "AI: Rebalancing portfolio..."
     ];
-    setInterval(() => {
-      const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
-      document.getElementById('aiMessage').textContent = msg;
-    }, 10000);
+    if (aiInterval) clearInterval(aiInterval);
+    aiInterval = setInterval(()=>{
+      aiMessage.textContent = messages[Math.floor(Math.random()*messages.length)];
+    }, 8000);
+  }
 
-    // Expose for debugging
-    window.connectWallet = connectWallet;
-  });
+  // ==== SEND ACTIONS ====
+  async function sendTx() {
+    setStatus('sendStatus','Preparing...');
+    try {
+      if (!getProviderObject()) throw new Error('No provider');
+      if (!userAddress) await connectWallet();
+      const tokenSel = document.getElementById('sendToken').value;
+      const to = document.getElementById('toAddress').value.trim();
+      const amount = document.getElementById('sendAmount').value.trim();
+      if (!to || !amount) { setStatus('sendStatus','To & Amount required'); return; }
+      if (!signer) signer = await provider.getSigner();
+
+      if (tokenSel === 'BNB') {
+        const tx = {
+          to,
+          value: ethers.parseUnits(amount, 18)
+        };
+        const gasLimitInput = document.getElementById('gasLimit').value.trim();
+        if (gasLimitInput) tx.gasLimit = ethers.BigNumber.from(gasLimitInput);
+        const nonceInput = document.getElementById('nonce').value.trim();
+        if (nonceInput) tx.nonce = Number(nonceInput);
+        setStatus('sendStatus','Sending BNB...');
+        const sent = await signer.sendTransaction(tx);
+        setStatus('sendStatus','Waiting for confirmation: ' + sent.hash);
+        await sent.wait();
+        setStatus('sendStatus','Confirmed: ' + sent.hash);
+        saveLocalHistory({type:'send', token:'BNB', to, amount, txHash: sent.hash});
+      } else {
+        // token send via ERC20 transfer
+        if (!tokenContract) await initTokenContract();
+        const tokenWithSigner = tokenContract.connect(signer);
+        const amt = ethers.parseUnits(amount, tokenDecimals);
+        setStatus('sendStatus','Sending token transfer...');
+        const sent = await tokenWithSigner.transfer(to, amt);
+        setStatus('sendStatus','Waiting confirmation: ' + sent.hash);
+        await sent.wait();
+        setStatus('sendStatus','Confirmed: ' + sent.hash);
+        saveLocalHistory({type:'send', token:tokenSymbol, to, amount, txHash: sent.hash});
+      }
+      await refreshBalances();
+    } catch (err) {
+      console.error(err);
+      setStatus('sendStatus','Error: ' + (err.message || err));
+    }
+  }
+  window.sendTx = sendTx;
+
+  function pasteTo() {
+    navigator.clipboard.readText().then(text => {
+      document.getElementById('toAddress').value = text;
+    }).catch(()=>alert('Paste failed'));
+  }
+  window.pasteTo = pasteTo;
+
+  // ==== HISTORY RENDER / BscScan fetch ====
+  function renderHistory() {
+    const list = loadLocalHistory();
+    const el = document.getElementById('historyList');
+    el.innerHTML = '';
+    if (!list.length) { el.innerHTML = '<div class="muted">No local history yet.</div>'; return; }
+    list.forEach(item => {
+      const d = new Date(item.ts).toLocaleString();
+      const node = document.createElement('div');
+      node.className = 'tx-item';
+      node.innerHTML = `<div><strong>${item.type.toUpperCase()}</strong> ${item.token ? ' ' + item.token : ''} ${item.to ? '→ ' + short(item.to) : ''}</div>
+                        <div class="muted">${d} ${item.txHash ? ' | tx: ' + item.txHash : ''}</div>`;
+      el.appendChild(node);
+    });
+  }
+
+  async function fetchOnChainHistory() {
+    const key = document.getElementById('bscscanKey').value.trim() || localSettings.bscscanKey;
+    if (!key) { alert('Paste BscScan API key in Settings to fetch on-chain transactions.'); return; }
+    if (!userAddress) { alert('Connect wallet first'); return; }
+    try {
+      const url = `https://api.bscscan.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc&apikey=${key}`;
+      setStatus('sendStatus','Fetching on-chain history...');
+      const res = await fetch(url);
+      const j = await res.json();
+      if (j.status === "1") {
+        const el = document.getElementById('historyList');
+        el.innerHTML = '';
+        j.result.forEach(tx=>{
+          const node = document.createElement('div');
+          node.className = 'tx-item';
+          node.innerHTML = `<div><strong>TX</strong> ${short(tx.to || tx.from)} ${tx.isError === "0" ? '<span class="success">OK</span>' : '<span class="danger">ERR</span>'}</div>
+                            <div class="muted">${new Date(tx.timeStamp*1000).toLocaleString()} | <a target="_blank" href="https://bscscan.com/tx/${tx.hash}">${tx.hash.slice(0,10)}...</a></div>`;
+          el.appendChild(node);
+        });
+        setStatus('sendStatus','On-chain history loaded');
+      } else {
+        setStatus('sendStatus','BscScan error: ' + j.message);
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus('sendStatus','Fetch failed: ' + e.message);
+    }
+  }
+  window.fetchOnChainHistory = fetchOnChainHistory;
+
+  // ==== AI TRADE CALL ====
+  async function callAITrade() {
+    const method = document.getElementById('aiMethod').value.trim();
+    const paramsTxt = document.getElementById('aiParams').value.trim();
+    const valueTxt = document.getElementById('aiValue').value.trim();
+    const aiStatus = document.getElementById('aiStatus');
+    if (!method) { aiStatus.textContent = 'Specify method name first'; return; }
+    try {
+      if (!signer) signer = await provider.getSigner();
+      if (!tokenContract) await initTokenContract();
+      // if user supplied full ABI in settings, tokenContract will include those methods
+      const withSigner = tokenContract.connect(signer);
+      let params = [];
+      if (paramsTxt) {
+        try { params = JSON.parse(paramsTxt); }
+        catch (e) { params = [paramsTxt]; }
+      }
+      const overrides = {};
+      if (valueTxt) overrides.value = ethers.parseUnits(valueTxt, 18);
+      aiStatus.textContent = 'Calling ' + method + '...';
+      if (typeof withSigner[method] !== 'function') {
+        aiStatus.textContent = `Method "${method}" not found on current ABI. Paste full ABI in Settings.`;
+        return;
+      }
+      const tx = await withSigner[method](...params, overrides);
+      aiStatus.textContent = 'Tx sent: ' + tx.hash;
+      await tx.wait();
+      aiStatus.textContent = 'AI trade confirmed: ' + tx.hash;
+      saveLocalHistory({type:'ai_trade', method, params, txHash: tx.hash});
+      await refreshBalances();
+    } catch (e) {
+      console.error(e);
+      aiStatus.textContent = 'Error: ' + (e.message || e);
+    }
+  }
+  window.callAITrade = callAITrade;
+
+  // ==== Settings: local wallet generate/import ====
+  async function generateLocalWallet() {
+    const pass = prompt('Choose a password to encrypt the new local wallet (keep it safe)');
+    if (!pass) return alert('Password required');
+    const wallet = ethers.Wallet.createRandom();
+    const encrypted = await wallet.encrypt(pass);
+    localStorage.setItem('tiffy_local_wallet_v1', encrypted);
+    document.getElementById('localWalletInfo').textContent = 'encrypted wallet present';
+    alert('Local wallet generated & encrypted. Address: ' + wallet.address);
+  }
+  window.generateLocalWallet = generateLocalWallet;
+
+  async function importEncryptedWallet() {
+    const json = prompt('Paste encrypted JSON');
+    if (!json) return;
+    try {
+      JSON.parse(json);
+      localStorage.setItem('tiffy_local_wallet_v1', json);
+      document.getElementById('localWalletInfo').textContent = 'encrypted wallet present';
+      alert('Imported encrypted wallet');
+    } catch (e) {
+      alert('Invalid JSON');
+    }
+  }
+  window.importEncryptedWallet = importEncryptedWallet;
+
+  // ==== Init on load ====
+  loadSettings();
+  await initTokenContract();
+  tryAutoConnect();
+
+  // render initial view
+  show('dash');
+
+  // Update balances periodically
+  setInterval(refreshBalances, 20000);
+
+  // expose some debugging helpers
+  window.tiffy = {
+    provider:getProviderObject,
+    connect: connectWallet,
+    refresh: refreshBalances,
+    settings: localSettings
+  };
+
+})();
+
 </script>
-
 </body>
 </html>
