@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TiffyWallet</title>
+  <style>
+    :root {
+      --bg: #000;
+      --text: #0f0;
+      --accent: #00f0ff;
+      --accent2: #ff00d4;
+      --card: rgba(0, 255, 0, 0.05);
+      --border: rgba(0, 255, 0, 0.2);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      width: 80px; height: 80px;
+      margin: 0 auto 12px;
+      background: conic-gradient(var(--accent), var(--accent2), var(--accent));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 32px;
+      color: #000;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    h1 {
+      font-size: 24px;
+      letter-spacing: 2px;
+    }
+    .balance {
+      padding: 24px 20px;
+      text-align: center;
+      border-bottom: 1px dashed var(--border);
+    }
+    .amount {
+      font-size: 36px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .usd {
+      font-size: 18px;
+      opacity: 0.8;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      padding: 20px;
+    }
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .btn:active {
+      background: var(--accent);
+      color: #000;
+      transform: scale(0.95);
+    }
+    .ai-pulse {
+      padding: 16px 20px;
+      background: rgba(0, 255, 0, 0.1);
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .ai-text {
+      display: block;
+      margin-top: 6px;
+      font-style: italic;
+      opacity: 0.9;
+    }
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    .footer-btn {
+      font-size: 12px;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      opacity: 0.7;
+    }
+    .footer-btn:active { opacity: 1; color: var(--accent); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- DASH -->
+  <div id="dash">
+    <div class="header">
+      <div class="logo">TI</div>
+      <h1>TIFFY WALLET</h1>
+    </div>
+
+    <div class="balance">
+      <div class="amount" id="balanceAmount">1,247.00</div>
+      <div class="usd" id="balanceUSD">≈ $1,247.00 USD</div>
+    </div>
+
+    <div class="actions">
+      <div class="btn" onclick="openSend()">SEND</div>
+      <div class="btn" onclick="openReceive()">RECEIVE</div>
+      <div class="btn" onclick="openSwap()">SWAP</div>
+    </div>
+
+    <div class="ai-pulse">
+      AI Pulse
+      <span class="ai-text" id="aiMessage">BNB dip detected. 3 whales selling. HOLD.</span>
+    </div>
+
+    <div class="footer">
+      <div class="footer-btn" onclick="openHistory()">History</div>
+      <div class="footer-btn" onclick="openAITrades()">AI Trades</div>
+      <div class="footer-btn" onclick="openSettings()">Settings</div>
+    </div>
+  </div>
+
+  <!-- SEND SCREEN -->
+  <div id="sendScreen" class="hidden">
+    <div class="header">
+      <div class="logo">TI</div>
+      <h1>SEND TIFFY</h1>
+    </div>
+    <div style="padding:20px;">
+      <input type="text" id="sendTo" placeholder="To: 0x..." style="width:100%; padding:14px; background:rgba(0,255,0,0.1); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:16px; margin-bottom:12px;" />
+      <input type="number" id="sendAmount" placeholder="Amount: 500" style="width:100%; padding:14px; background:rgba(0,255,0,0.1); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:16px; margin-bottom:12px;" />
+      <div style="display:flex; gap:8px; margin-bottom:16px;">
+        <div class="btn" style="flex:1;" onclick="pasteAddress()">PASTE</div>
+        <div class="btn" style="flex:1;" onclick="scanQR()">SCAN QR</div>
+        <div class="btn" style="flex:1;" onclick="setMax()">MAX</div>
+      </div>
+      <div class="ai-pulse">
+        AI: <span id="aiSendCheck">"Valid address. Last tx: 2h ago."</span>
+      </div>
+      <div class="btn" style="margin-top:20px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000;" onclick="sendNow()">SEND NOW</div>
+      <div class="btn" style="margin-top:12px;" onclick="backToDash()">← Back</div>
+    </div>
+  </div>
+
+  <!-- RECEIVE SCREEN -->
+  <div id="receiveScreen" class="hidden">
+    <div class="header">
+      <div class="logo">TI</div>
+      <h1>RECEIVE TIFFY</h1>
+    </div>
+    <div style="padding:20px; text-align:center;">
+      <div id="qrCode" style="width:200px; height:200px; margin:20px auto; background:#fff; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:12px; color:#000;">
+        [QR CODE HERE]
+      </div>
+      <div style="word-break:break-all; padding:12px; background:rgba(0,255,0,0.1); border-radius:12px; font-size:14px;" id="receiveAddress">
+        0xed9b43bED20B063ae0966C0AEC446bc755fB84bA
+      </div>
+      <div style="display:flex; gap:8px; margin-top:16px;">
+        <div class="btn" style="flex:1;" onclick="copyAddress()">COPY</div>
+        <div class="btn" style="flex:1;" onclick="shareAddress()">SHARE</div>
+      </div>
+      <div class="ai-pulse" style="margin-top:16px;">
+        AI: <span id="aiQRScans">"This QR has been scanned 12 times today."</span>
+      </div>
+      <div class="btn" style="margin-top:20px;" onclick="backToDash()">← Back</div>
+    </div>
+  </div>
+
+  <!-- SWAP SCREEN -->
+  <div id="swapScreen" class="hidden">
+    <div class="header">
+      <div class="logo">TI</div>
+      <h1>SWAP</h1>
+    </div>
+    <div style="padding:20px;">
+      <div style="background:var(--card); padding:16px; border-radius:12px; margin-bottom:12px;">
+        <div>FROM:</div>
+        <div style="font-size:24px; font-weight:900;">0.5 BNB</div>
+      </div>
+      <div style="background:var(--card); padding:16px; border-radius:12px; margin-bottom:12px;">
+        <div>TO:</div>
+        <div style="font-size:24px; font-weight:900;">405.00 TIFFY</div>
+      </div>
+      <div class="ai-pulse">
+        Slippage: 0.5% <span style="display:block; margin-top:4px;">AI: "Market stable. SAFE."</span>
+      </div>
+      <div class="btn" style="margin-top:20px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000;" onclick="swapNow()">SWAP NOW</div>
+      <div class="btn" style="margin-top:12px;" onclick="backToDash()">← Back</div>
+    </div>
+  </div>
+
+<script>
+  // === STATE ===
+  let wallet = null;
+  let balance = 1247.00;
+  let usdPrice = 1.00;
+
+  // === DOM ===
+  const screens = {
+    dash: document.getElementById('dash'),
+    send: document.getElementById('sendScreen'),
+    receive: document.getElementById('receiveScreen'),
+    swap: document.getElementById('swapScreen')
+  };
+
+  // === NAVIGATION ===
+  function show(screen) {
+    Object.values(screens).forEach(s => s.classList.add('hidden'));
+    screens[screen].classList.remove('hidden');
+  }
+  function backToDash() { show('dash'); }
+  function openSend() { show('send'); }
+  function openReceive() { show('receive'); generateQR(); }
+  function openSwap() { show('swap'); }
+
+  // === DASH ===
+  function updateBalance() {
+    document.getElementById('balanceAmount').textContent = balance.toFixed(2);
+    document.getElementById('balanceUSD').textContent = `≈ $${(balance * usdPrice).toFixed(2)} USD`;
+  }
+
+  // === SEND ===
+  function pasteAddress() {
+    navigator.clipboard.readText().then(text => {
+      document.getElementById('sendTo').value = text;
+    });
+  }
+  function scanQR() { alert('QR Scanner: Coming in v2'); }
+  function setMax() {
+    document.getElementById('sendAmount').value = balance;
+  }
+  function sendNow() {
+    const to = document.getElementById('sendTo').value;
+    const amount = parseFloat(document.getElementById('sendAmount').value);
+    if (!to || !amount || amount > balance) return alert('Invalid');
+    balance -= amount;
+    updateBalance();
+    alert(`Sent \( {amount} TIFFY to \){to.slice(0,6)}...`);
+    backToDash();
+  }
+
+  // === RECEIVE ===
+  function generateQR() {
+    const addr = '0xed9b43bED20B063ae0966C0AEC446bc755fB84bA';
+    document.getElementById('receiveAddress').textContent = addr;
+    document.getElementById('qrCode').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${addr}" style="width:100%; height:100%; border-radius:12px;">`;
+  }
+  function copyAddress() {
+    const addr = document.getElementById('receiveAddress').textContent;
+    navigator.clipboard.writeText(addr);
+    alert('Copied!');
+  }
+  function shareAddress() {
+    const addr = document.getElementById('receiveAddress').textContent;
+    if (navigator.share) {
+      navigator.share({ text: addr });
+    } else {
+      copyAddress();
+    }
+  }
+
+  // === SWAP ===
+  function swapNow() {
+    alert('Swap executed: 0.5 BNB → 405 TIFFY');
+    balance += 405;
+    updateBalance();
+    backToDash();
+  }
+
+  // === AI PULSE (FAKE FOR NOW) ===
+  const aiMessages = [
+    "BNB dip detected. 3 whales selling. HOLD.",
+    "TIFFY volume up 300%. BUY signal.",
+    "Market stable. AI recommends SWAP.",
+    "Whale alert: 10k TIFFY moved."
+  ];
+  setInterval(() => {
+    const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
+    document.getElementById('aiMessage').textContent = msg;
+  }, 8000);
+
+  // === INIT ===
+  updateBalance();
+  generateQR();
+</script>
+
+</body>
+</html>
